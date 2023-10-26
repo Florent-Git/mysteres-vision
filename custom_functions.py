@@ -22,9 +22,9 @@ def get_circles(image):
     closed_image = cv.morphologyEx(threshold_image, cv.MORPH_CLOSE, np.ones((31, 31)))
     image_circles = cv.HoughCircles(closed_image, cv.HOUGH_GRADIENT, dp=1, minDist=100, param1=50, param2=10, minRadius=73, maxRadius=78)
 
-    print(image_circles)
+    #print(image_circles)
 
-    return np.uint16(np.around(image_circles))
+    return np.uint16(np.around(image_circles))[0,:]
 
 
 if __name__ == "__main__":
