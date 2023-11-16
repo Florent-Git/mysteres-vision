@@ -35,6 +35,16 @@ def get_average_circles(image, circles):
         circles_dict[circle_average] = i
     return circles_dict
 
+def sort_circles(circles):
+    xSorted = circles[np.argsort(circles[:, 0]), :]
+    leftMost = xSorted[:3, :]
+    middle = xSorted[3:6, :]
+    rightMost = xSorted[6:, :]
+    (tl, ml, bl) = leftMost[np.argsort(leftMost[:, 1]), :]
+    (tm, mm, bm) = middle[np.argsort(middle[:, 1]), :]
+    (tr, mr, br) = rightMost[np.argsort(rightMost[:, 1]), :]
+    sorted_circles = [tl, tm, tr, ml, mm, mr, bl, bm, br]
+    return sorted_circles
 
 if __name__ == "__main__":
     images = listdir("./images")
