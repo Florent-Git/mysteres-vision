@@ -2,21 +2,24 @@ from flask import Flask
 from flask import jsonify
 
 from tuiles import TILE_LABELS
+from tile import Tile
 
 import random
 
-app = Flask("MysteresAPI")
-        
-@app.route('/get_tiles', methods=['POST'])
-def get_tiles():
-    '''
-    Retrieves an image from the post request and returns the type of tiles
-    '''
-    # Get 9 random distinct tiles from TILE_LABELS
-    tiles = random.sample(TILE_LABELS, 9)
-    return jsonify(list(map(lambda x: x.tile_id, tiles)))
+# Use SocketIO to create a state where the client continuously sends an image as an event
+from flask_socketio import SocketIO, emit
+
+app = Flask(__name__)
+socketio = SocketIO(app)
+
+@socketio.on('check_image')
+def check_image(data):
+    # Return an array of Tile objects
+    tiles = []
+    for i in range(0, 16):
+        tiles.append(Tile((random.randint(0, 100), random.randint(0, 100), random.randint(0, 100)), TILE_LABELS[random.randint(0, 3)]).with_index(i).with_tile_id(i).with_img_id(i))
+    emit('image_checked', {'tiles': [tile.__dict__ for tile in tiles]})
     
-
-if __name__ == "__main__":
-    app.run(debug=True, host='YOUR_IP_ADDRESS')
-
+    
+if __name__ == '__main__':
+    socketio.run(app, debug=True)

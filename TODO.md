@@ -1,9 +1,1 @@
-Pour le next time :
-- Trouver les coordonnées de chaque tuile 
-- Lier la position de chaque tuile à son identifiant
-```json
-  {
-    "identifiant" : [averageIMG1, averageIMG2,…]
-  }
-```
-- Trouver la moyenne et l'écart-type de chaque tuile pour faire la détection des tuiles
+-> À partir du moment où on a les coordonnées des centres des cercles, on peut continuellement essayer de détecter s'il y a un grand changement de couleur à l'interrieur d'un cercle et donc détecter si le cercle est sélectionné ou non.
