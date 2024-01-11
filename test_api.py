@@ -38,7 +38,6 @@ def home():
         <input type="submit">
     </form>
     '''
-
         
 @app.route('/get_tiles', methods=['POST'])
 def get_tiles():
