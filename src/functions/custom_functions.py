@@ -1,4 +1,4 @@
-from tile import Tile
+from model.tile import Tile
 
 import pandas as pd
 import numpy as np
@@ -77,14 +77,14 @@ def sort_circles(tiles: [Tile]):
     for tile in tiles:
         for circle in sorted_circles:
             if np.array_equal(tile.dimensions, circle):
-                returned_array.append(tile.with_index(sorted_circles.index(circle)))
+                returned_array.append(tile.set_index(sorted_circles.index(circle)))
     
     # Sort returned_array by index
     returned_array = sorted(returned_array, key=lambda tile: tile.index)            
     return returned_array
     
     
-def get_tiles(image):
+def get_tiles(image: np.array) -> [Tile]:
     '''
     Retrieves the tiles from an image.
     '''
@@ -98,6 +98,6 @@ def tiles_to_dataframe(tiles):
     '''
     Converts a list of tiles to a dataframe
     '''
-    data = [[tile.color[0], tile.color[1], tile.color[2], tile.dimensions[0], tile.dimensions[1], tile.dimensions[2], tile.tile_id, tile.img_id] for tile in tiles]
-    return pd.DataFrame(data, columns=["hue", "saturation", "value", "position_x", "position_y", "radius", "tile_id", "img_id"])
+    data = [[tile.color[0], tile.color[1], tile.color[2], tile.dimensions[0], tile.dimensions[1], tile.dimensions[2], tile.tile_type, tile.img_id] for tile in tiles]
+    return pd.DataFrame(data, columns=["hue", "saturation", "value", "position_x", "position_y", "radius", "tile_type", "img_id"])
 

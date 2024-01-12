@@ -2,7 +2,7 @@ from flask import Flask
 from flask import jsonify
 
 from tuiles import TILE_LABELS
-from tile import Tile
+from src.model.tile import Tile
 
 import random
 
@@ -17,7 +17,7 @@ def check_image(data):
     # Return an array of Tile objects
     tiles = []
     for i in range(0, 16):
-        tiles.append(Tile((random.randint(0, 100), random.randint(0, 100), random.randint(0, 100)), TILE_LABELS[random.randint(0, 3)]).with_index(i).with_tile_id(i).with_img_id(i))
+        tiles.append(Tile((random.randint(0, 100), random.randint(0, 100), random.randint(0, 100)), TILE_LABELS[random.randint(0, 3)]).set_index(i).set_tile_type(i).set_img_id(i))
     emit('image_checked', {'tiles': [tile.__dict__ for tile in tiles]})
     
     

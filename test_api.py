@@ -1,6 +1,6 @@
 from flask import Flask
 from flask import request, jsonify
-from custom_functions import get_tiles as _get_tiles, tiles_to_dataframe
+from src.functions.custom_functions import get_tiles as _get_tiles, tiles_to_dataframe
 
 import numpy as np
 import cv2 as cv
