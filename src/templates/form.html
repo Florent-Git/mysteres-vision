@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Form</title>
+</head>
+<body>
+    <form method="POST" action="/get_image_tiles" id="form" enctype="multipart/form-data">
+        <input type="file" id="in" name="image" accept="image/*">
+        <input type="button" id="btn" value="Upload">
+        <input type="button" id="poll" value="Poll">
+    </form>
+
+    <p id="output"></p>
+
+    <script>
+        const form = document.querySelector("#form");
+        const button = document.querySelector("#btn");
+        const poll = document.querySelector("#poll");
+        const fileInput = document.querySelector("#in");
+        const output = document.querySelector("#output");
+
+        var base64String = "";
+        var returnedValue = {};
+ 
+        fileInput.onchange = function() {
+            let file = document.querySelector(
+                'input[type=file]')['files'][0];
+ 
+            let reader = new FileReader();
+            console.log("next");
+ 
+            reader.onload = function () {
+                base64String = reader.result.replace("data:", "")
+                    .replace(/^.+,/, "");
+ 
+                imageBase64Stringsep = base64String;
+ 
+                // alert(imageBase64Stringsep);
+                console.log(base64String);
+            }
+            reader.readAsDataURL(file);
+        }
+
+        button.onclick = function() {
+            fetch("http://127.0.0.1:5000/get_image_tiles", {
+                method: "POST",
+                mode: "same-origin",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ image: base64String })
+            }).then(function (it) { return it.json(); })
+                .then(function (it) { returnedValue = it; return it; })
+                .then(function (json) { console.log(json); })
+                .catch(function (e) { console.error("Unexpected error: " + e); })
+        }
+
+        poll.onclick = function() {
+            fetch("http://127.0.0.1:5000/poll_changes", {
+                method: "POST",
+                mode: "same-origin",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ image: base64String, tiles: returnedValue })
+            })
+        }
+
+        console.log(form);
+    </script>
+</body>
+</html>

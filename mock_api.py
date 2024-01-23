@@ -1,7 +1,7 @@
 from flask import Flask
 from flask import jsonify
 
-from tuiles import TILE_LABELS
+from src.learning.tuiles import TILE_LABELS
 from src.model.tile import Tile
 
 import random

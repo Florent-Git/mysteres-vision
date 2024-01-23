@@ -1,5 +1,6 @@
 from model.tile import Tile
 
+import colorsys
 import pandas as pd
 import numpy as np
 import cv2 as cv
@@ -30,34 +31,36 @@ def get_circles(image: np.array) -> np.array:
     '''
     Retrieves the circles in an image.
     '''
-    circles = cv.HoughCircles(image, cv.HOUGH_GRADIENT, dp=1, minDist=100, param1=50, param2=10, minRadius=73, maxRadius=78)
+    circles = cv.HoughCircles(image, cv.HOUGH_GRADIENT, dp=1, minDist=100, param1=50, param2=10, minRadius=50, maxRadius=58)
     return np.uint16(np.around(circles))[0,:]
 
-def get_average_circles(image, circles):
+def get_circles_color(image, circles, np_fun):
     '''
     Retrieves the average color of the circles in an image in HSV format.
     '''
     circles_array = []
-    h,s,v = cv.split(cv.cvtColor(image, cv.COLOR_RGB2HSV))
+    r,g,b = cv.split(image)
     for i in circles:
         mask = np.full((image.shape[0], image.shape[1]),0,dtype=np.uint8)
-        print(i)
         cv.circle(mask, (i[0], i[1]), i[2], (255, 255, 255), -1)
 
-        h_circle_masked = cv.bitwise_and(h, h, mask = mask)
-        s_circle_masked = cv.bitwise_and(s, s, mask = mask)
-        v_circle_masked = cv.bitwise_and(v, v, mask = mask)
+        r_circle_masked = cv.bitwise_and(r, r, mask = mask)
+        g_circle_masked = cv.bitwise_and(g, g, mask = mask)
+        b_circle_masked = cv.bitwise_and(b, b, mask = mask)
 
-        h_pos_circle = h_circle_masked[h_circle_masked!=0]
-        s_pos_circle = s_circle_masked[s_circle_masked!=0]
-        v_pos_circle = v_circle_masked[v_circle_masked!=0]
+        r_pos_circle = r_circle_masked[r_circle_masked!=0]
+        g_pos_circle = g_circle_masked[g_circle_masked!=0]
+        b_pos_circle = b_circle_masked[b_circle_masked!=0]
 
-        h_circle_average = np.average(h_pos_circle)
-        s_circle_average = np.average(s_pos_circle)
-        v_circle_average = np.average(v_pos_circle)
+        r_circle_average = np_fun(r_pos_circle)
+        g_circle_average = np_fun(g_pos_circle)
+        b_circle_average = np_fun(b_pos_circle)
 
-        circles_array.append(Tile(i, tuple([h_circle_average, s_circle_average, v_circle_average])))
+        circles_array.append(Tile(i, tuple([r_circle_average / 255, g_circle_average / 255, b_circle_average / 255])))
     return circles_array
+
+def get_average_circles(image, circles):
+    return get_circles_color(image, circles, np.mean)
 
 def sort_circles(tiles: [Tile]):
     returned_array = []
@@ -84,14 +87,14 @@ def sort_circles(tiles: [Tile]):
     return returned_array
     
     
-def get_tiles(image: np.array) -> [Tile]:
+def get_tiles(image: np.ndarray) -> list[Tile]:
     '''
     Retrieves the tiles from an image.
     '''
-    half_image = cv.resize(image, (image.shape[1]//2, image.shape[0]//2))
-    preprocessed_image = preprocess_image(half_image)
+    # half_image = cv.resize(image, (image.shape[1]*1.5, image.shape[0]*1.5))
+    preprocessed_image = preprocess_image(image)
     circles = get_circles(preprocessed_image)
-    average_circles = get_average_circles(half_image, circles)
+    average_circles = get_average_circles(image, circles)
     return sort_circles(average_circles)
 
 def tiles_to_dataframe(tiles):
@@ -99,5 +102,5 @@ def tiles_to_dataframe(tiles):
     Converts a list of tiles to a dataframe
     '''
     data = [[tile.color[0], tile.color[1], tile.color[2], tile.dimensions[0], tile.dimensions[1], tile.dimensions[2], tile.tile_type, tile.img_id] for tile in tiles]
-    return pd.DataFrame(data, columns=["hue", "saturation", "value", "position_x", "position_y", "radius", "tile_type", "img_id"])
+    return pd.DataFrame(data, columns=["red", "green", "blue", "position_x", "position_y", "radius", "tile_type", "img_id"])
 
